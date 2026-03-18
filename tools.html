@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Tools — Crypto Crime</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .tools-hero { padding:7rem 2rem 3rem; max-width:1100px; margin:0 auto; }
+    .tools-note { background:rgba(0,255,65,0.04);border:1px solid var(--border);border-left:3px solid var(--green);padding:0.9rem 1.25rem;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:2.5rem; }
+    .tools-note strong { color:var(--green); }
+    .select-input { background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:2px;padding:0.5rem 0.8rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--text);outline:none;cursor:pointer; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">CRYPTO<span>CRIME</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#register">Register</a>
+  </div>
+  <div class="nav-status"><div class="status-dot"></div>TOOLS</div>
+</nav>
+
+<div class="tools-hero">
+  <p class="section-label">// Cryptographic Arsenal</p>
+  <h1 class="section-title">Crypto Tools</h1>
+  <div class="section-divider"></div>
+
+  <div class="tools-note">
+    <strong>📡 Investigation Resource:</strong> These are your weapons.
+    Each level uses one of the techniques below. Study them. Use them when you're stuck.
+    The clock doesn't stop for anyone.
+  </div>
+
+  <div class="tools-grid">
+
+    <!-- ROT13 -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">ROT13</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Substitution Cipher</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag easy">Easy</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">ROT13 rotates each letter by 13 positions. A→N, B→O, etc. It's symmetric — encoding and decoding use the exact same operation.</p>
+        <div class="tool-demo">
+          <textarea class="tool-input" id="rot13In" placeholder="Type text here..." rows="2"></textarea>
+          <button class="btn btn-primary tool-btn" onclick="doROT13()">Decode / Encode</button>
+          <textarea class="tool-output" id="rot13Out" placeholder="Output appears here..." rows="2" readonly></textarea>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 1 · Tip: Every letter maps to exactly one other letter.</div>
+      </div>
+    </div>
+
+    <!-- CAESAR -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">Caesar Cipher</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Shift Cipher</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag easy">Easy</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">Shifts every letter by a fixed number. With shift 3: A→D, B→E. If you don't know the shift, use brute force to try all 25 options.</p>
+        <div class="tool-demo">
+          <textarea class="tool-input" id="caesarIn" placeholder="Enter ciphered text..." rows="2"></textarea>
+          <div class="flex-row">
+            <label style="font-size:0.72rem;color:var(--text-dim);">Shift:</label>
+            <input type="number" class="tool-input" id="caesarShift" value="3" min="1" max="25" style="width:70px;min-height:auto;resize:none;padding:0.4rem 0.6rem;"/>
+            <button class="btn btn-primary tool-btn" onclick="doCaesar()">Decode</button>
+          </div>
+          <textarea class="tool-output" id="caesarOut" placeholder="Output..." rows="2" readonly></textarea>
+          <button class="btn btn-outline tool-btn" onclick="caesarBrute()" style="font-size:0.68rem;">Try All Shifts</button>
+          <textarea class="tool-output" id="caesarBruteOut" placeholder="All 25 shifts shown here..." rows="6" readonly style="font-size:0.7rem;"></textarea>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 2 (step 2) · Tip: Look for the shift that produces a real word or phrase.</div>
+      </div>
+    </div>
+
+    <!-- BINARY -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">Binary ↔ Text</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Base-2 Encoding</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag easy">Easy</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">Binary represents data as 0s and 1s. Each character is 8 bits. A = 01000001. Convert binary to ASCII to get readable text.</p>
+        <div class="tool-demo">
+          <textarea class="tool-input" id="binIn" placeholder="Enter binary (e.g. 01001000 01101001)..." rows="3"></textarea>
+          <div class="flex-row">
+            <button class="btn btn-primary tool-btn" onclick="binToText()">Binary → Text</button>
+            <button class="btn btn-outline tool-btn" onclick="textToBin()">Text → Binary</button>
+          </div>
+          <textarea class="tool-output" id="binOut" placeholder="Output appears here..." rows="2" readonly></textarea>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 2 (step 1) · Tip: Copy the output into the Caesar decoder for step 2.</div>
+      </div>
+    </div>
+
+    <!-- VIGENÈRE -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">Vigenère Cipher</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Polyalphabetic Cipher</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag medium">Medium</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">Uses a keyword to apply different Caesar shifts to each letter. The keyword repeats over the message. You need the exact keyword to decode it.</p>
+        <div class="tool-demo">
+          <textarea class="tool-input" id="vigIn" placeholder="Enter Vigenère ciphered text..." rows="2"></textarea>
+          <div class="flex-row">
+            <input type="text" class="tool-input" id="vigKey" placeholder="Keyword (e.g. CIPHER)" style="flex:1;min-height:auto;resize:none;padding:0.5rem 0.8rem;text-transform:uppercase;"/>
+            <button class="btn btn-primary tool-btn" onclick="doVigenere()">Decode</button>
+          </div>
+          <textarea class="tool-output" id="vigOut" placeholder="Output appears here..." rows="2" readonly></textarea>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 4 · Tip: The keyword is hidden inside a riddle on the level page.</div>
+      </div>
+    </div>
+
+    <!-- AES -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">AES Decryption</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Advanced Encryption Standard</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag hard">Hard</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">AES is modern military-grade encryption. It uses a password (key) to encrypt and decrypt. Without the key, it's impossible to crack. The key is hidden in a riddle.</p>
+        <div class="tool-demo">
+          <p style="font-size:0.72rem;color:var(--text-dim);line-height:1.6;">
+            Use <a href="https://cyberchef.org" target="_blank" style="color:var(--cyan)">CyberChef</a> to decrypt:<br/>
+            1. Recipe: <strong style="color:var(--green)">AES Decrypt</strong><br/>
+            2. Mode: <strong style="color:var(--green)">ECB</strong> · Key format: <strong style="color:var(--green)">UTF8</strong><br/>
+            3. Paste encrypted string → enter key → Bake
+          </p>
+          <a href="https://cyberchef.org/#recipe=AES_Decrypt" target="_blank" class="btn btn-outline tool-btn">Open CyberChef →</a>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 5 · Tip: The password will be a single lowercase word derived from the riddle.</div>
+      </div>
+    </div>
+
+    <!-- STEGANOGRAPHY -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">Steganography</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">Hidden in Plain Sight</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag medium">Medium</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">Hides secret data inside ordinary image files. The image looks completely normal. The message is encoded in the least significant bits of pixels — invisible without the right tool.</p>
+        <div class="tool-demo">
+          <p style="font-size:0.72rem;color:var(--text-dim);line-height:1.6;">
+            Steps to extract:<br/>
+            1. Download the image from the level page<br/>
+            2. Open the decoder tool below<br/>
+            3. Upload the image → click Decode<br/>
+            4. The hidden text will appear
+          </p>
+          <a href="https://stylesuxx.github.io/steganography/" target="_blank" class="btn btn-outline tool-btn">Open Steg Decoder →</a>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 3 · Tip: The image looks perfectly ordinary. It isn't.</div>
+      </div>
+    </div>
+
+    <!-- SHA-256 -->
+    <div class="tool-card">
+      <div class="tool-card-header" onclick="toggleTool(this)">
+        <div><div class="tool-name">SHA-256 Hash</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">One-way Cryptographic Hash</div></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;"><span class="tool-tag hard">Hard</span><span class="tool-chevron">▼</span></div>
+      </div>
+      <div class="tool-card-body">
+        <p class="tool-desc">SHA-256 converts any input into a fixed 64-character hash. It's one-way — you can't reverse it. Hash each suspect name and compare to find the match.</p>
+        <div class="tool-demo">
+          <input type="text" class="tool-input" id="shaIn" placeholder="Type suspect name to hash..." style="min-height:auto;resize:none;padding:0.6rem 0.8rem;"/>
+          <button class="btn btn-primary tool-btn" onclick="doSHA256()">Generate Hash</button>
+          <div class="tool-output" id="shaOut" style="min-height:50px;padding:0.6rem 0.8rem;word-break:break-all;font-size:0.72rem;">Hash appears here...</div>
+        </div>
+        <div class="tool-extra-info"><strong style="color:var(--green)">Used in:</strong> Level 6 · Tip: Hash each name from the suspect list. Names are case-sensitive — try lowercase.</div>
+      </div>
+    </div>
+
+  </div><!-- /tools-grid -->
+</div>
+
+<footer class="footer">CRYPTO CRIME &nbsp;·&nbsp; <span>MINDKRAFT</span> &nbsp;·&nbsp; TOOLS PAGE</footer>
+
+<script src="shared.js"></script>
+<script>
+  startBinaryRain(0.04);
+
+  function toggleTool(header) {
+    const body    = header.nextElementSibling;
+    const chevron = header.querySelector(".tool-chevron");
+    const isOpen  = body.classList.contains("open");
+    document.querySelectorAll(".tool-card-body").forEach(b => b.classList.remove("open"));
+    document.querySelectorAll(".tool-chevron").forEach(c => c.classList.remove("open"));
+    if (!isOpen) { body.classList.add("open"); chevron.classList.add("open"); }
+  }
+
+  function doROT13() {
+    document.getElementById("rot13Out").value =
+      document.getElementById("rot13In").value.replace(/[a-zA-Z]/g, c => {
+        const b = c <= "Z" ? 65 : 97;
+        return String.fromCharCode(((c.charCodeAt(0) - b + 13) % 26) + b);
+      });
+  }
+
+  function caesarDecrypt(text, shift) {
+    return text.replace(/[a-zA-Z]/g, c => {
+      const b = c <= "Z" ? 65 : 97;
+      return String.fromCharCode(((c.charCodeAt(0) - b - shift + 26) % 26) + b);
+    });
+  }
+  function doCaesar() {
+    const shift = parseInt(document.getElementById("caesarShift").value) || 3;
+    document.getElementById("caesarOut").value = caesarDecrypt(document.getElementById("caesarIn").value, shift);
+  }
+  function caesarBrute() {
+    const text = document.getElementById("caesarIn").value;
+    document.getElementById("caesarBruteOut").value =
+      Array.from({length:25},(_,i)=>`Shift ${String(i+1).padStart(2,"0")}: ${caesarDecrypt(text,i+1)}`).join("\n");
+  }
+
+  function binToText() {
+    try {
+      document.getElementById("binOut").value =
+        document.getElementById("binIn").value.trim().split(/\s+/)
+          .map(b => String.fromCharCode(parseInt(b, 2))).join("");
+    } catch { document.getElementById("binOut").value = "Error: Invalid binary input."; }
+  }
+  function textToBin() {
+    document.getElementById("binOut").value =
+      document.getElementById("binIn").value.split("")
+        .map(c => c.charCodeAt(0).toString(2).padStart(8,"0")).join(" ");
+  }
+
+  function doVigenere() {
+    const text = document.getElementById("vigIn").value.toUpperCase();
+    const key  = document.getElementById("vigKey").value.toUpperCase().replace(/[^A-Z]/g,"");
+    if (!key) { document.getElementById("vigOut").value = "Please enter a keyword."; return; }
+    let result = "", ki = 0;
+    for (const c of text) {
+      if (/[A-Z]/.test(c)) {
+        const shift = key.charCodeAt(ki % key.length) - 65;
+        result += String.fromCharCode(((c.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
+        ki++;
+      } else result += c;
+    }
+    document.getElementById("vigOut").value = result;
+  }
+
+  async function doSHA256() {
+    const text = document.getElementById("shaIn").value;
+    if (!text) return;
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    document.getElementById("shaOut").textContent =
+      Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+</script>
+</body>
+</html>

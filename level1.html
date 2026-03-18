@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 1 — Crypto Crime</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ACCESS DENIED -->
+<div class="access-denied" id="accessDenied">
+  <div style="font-size:4rem;">🔒</div>
+  <div class="denied-title">ACCESS DENIED</div>
+  <div class="denied-desc">You must physically be at the starting location and scan the QR code to access this level.</div>
+  <a href="index.html" class="btn btn-outline" style="margin-top:1rem;">← Back to Base</a>
+</div>
+
+
+
+<!-- QR UNLOCK SCREEN -->
+<div class="unlock-screen" id="unlockScreen">
+  <div class="unlock-title">📍 LOCATION UNLOCKED</div>
+  <div class="letter-earned">
+    <div class="letter-earned-label">LETTER COLLECTED</div>
+    <div class="letter-earned-char">R</div>
+  </div>
+  <div class="unlock-location">FOOD PROCESSING DEPARTMENT</div>
+  <div class="unlock-instruction">
+    Head to the <strong style="color:var(--cyan)">Food Processing Department</strong> on campus.
+    Find the QR code hidden at the location. Scan it to access <strong style="color:var(--green)">Level 2</strong>.
+    <br/><br/>
+    <span style="color:var(--yellow);font-size:0.72rem;">⚠ Do not share the QR with other teams.</span>
+  </div>
+
+
+
+  <button class="btn btn-outline" onclick="document.getElementById('unlockScreen').classList.remove('show')">
+    ← Back to Level 1
+  </button>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">CRYPTO<span>CRIME</span></a>
+  <div class="nav-links">
+    <a href="tools.html">Tools</a>
+    <a href="index.html">Home</a>
+  </div>
+  <div class="nav-status"><div class="status-dot"></div>LVL 1/6</div>
+</nav>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-timer" id="timerDisplay">00:00:00</div>
+  <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;">LEVEL 1 OF 6 — ROT13</div>
+  <div class="top-bar-tiles">
+    <div class="mini-tile" id="tile0">?</div>
+    <div class="mini-tile" id="tile1">?</div>
+    <div class="mini-tile" id="tile2">?</div>
+    <div class="mini-tile" id="tile3">?</div>
+    <div class="mini-tile" id="tile4">?</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="level-wrap">
+
+  <div class="progress-bar-wrap">
+    <div class="progress-label"><span>INVESTIGATION PROGRESS</span><span>LEVEL 1 / 6</span></div>
+    <div class="progress-track"><div class="progress-fill" style="width:16.6%"></div></div>
+  </div>
+
+  <div class="classified-banner">
+    <div class="classified-stamp">CLASSIFIED</div>
+    <div class="level-indicator">FILE 001 OF 006 &nbsp;·&nbsp; CIPHER: ROT13</div>
+  </div>
+
+  <div class="classified-file">
+    <div class="file-header">
+      <div class="file-meta">
+        <div class="file-id">CASE #MK-2601 &nbsp;·&nbsp; EVIDENCE FILE 01</div>
+        <div class="file-title">The First Transmission</div>
+      </div>
+      <div class="file-cipher-badge">ROT13 ENCODED</div>
+    </div>
+
+    <div class="file-body">
+      <div class="file-section">
+        <div class="file-section-label">Mission Briefing</div>
+        <p class="briefing-text">
+          Our surveillance team intercepted a <strong>scrambled transmission</strong> sent by the suspect
+          shortly before the breach. The message points to a location on campus where the next piece
+          of evidence was dropped.<br/><br/>
+          The encoding is primitive — the suspect got overconfident. Decode the transmission below.
+          The decoded text is your answer. It will tell you <strong>exactly where to go next</strong>.
+        </p>
+      </div>
+
+      <div class="file-section">
+        <div class="file-section-label">Intercepted Transmission</div>
+        <!-- ROT13 of "FOOD PROCESSING DEPARTMENT" -->
+        <div class="encoded-message">SBBQ CEBPRFFVAT QRCNEGZRAG</div>
+        <p style="font-size:0.68rem;color:var(--text-dim);margin-top:0.6rem;letter-spacing:0.05em;">
+          ↳ Use the <a href="tools.html" target="_blank" style="color:var(--cyan)">ROT13 tool</a> on the Tools page to decode this.
+        </p>
+      </div>
+
+      <div class="answer-section">
+        <div class="answer-label">// Submit Decoded Answer</div>
+        <div class="answer-input-row">
+          <input type="text" class="answer-input" id="answerInput"
+            placeholder="TYPE YOUR ANSWER HERE..."
+            autocomplete="off" spellcheck="false"/>
+          <button class="btn btn-primary answer-submit" onclick="checkAnswer()">SUBMIT</button>
+        </div>
+        <div class="answer-feedback" id="answerFeedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HINTS -->
+  <div class="hints-bar">
+    <span>HINTS REMAINING: <span id="hintsLeft" style="color:var(--yellow)">2</span></span>
+    <button class="hint-btn" id="hintBtn" onclick="showHint()">USE HINT</button>
+  </div>
+  <div class="hint-text" id="hintText"></div>
+
+  <!-- LETTER TILES -->
+  <div style="margin-top:2rem;text-align:center;">
+    <div style="font-size:0.62rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:0.75rem;">COLLECTED LETTERS</div>
+    <div class="letter-tiles">
+      <div class="letter-tile" id="bigTile0"><div class="redacted"></div></div>
+      <div class="letter-tile" id="bigTile1"><div class="redacted"></div></div>
+      <div class="letter-tile" id="bigTile2"><div class="redacted"></div></div>
+      <div class="letter-tile" id="bigTile3"><div class="redacted"></div></div>
+      <div class="letter-tile" id="bigTile4"><div class="redacted"></div></div>
+    </div>
+    <div style="font-size:0.62rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.15em;">
+      Each letter brings you closer to the criminal's name.
+    </div>
+  </div>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+  startBinaryRain(0.05);
+
+  // ── CONFIG ──
+  const LEVEL        = 1;
+  const VALID_TOKEN  = LEVEL_TOKENS[LEVEL];
+  const CORRECT_ANS  = "FOOD PROCESSING DEPARTMENT";
+  const LETTER       = "R";
+  const HINTS = [
+    "ROT13 shifts every letter by 13 positions. A↔N, B↔O, C↔P... Use the ROT13 tool on the Tools page.",
+    "The answer is a department name on campus. After decoding you'll know exactly where to go."
+  ];
+
+  let hintsUsed   = 0;
+  let levelSolved = false;
+  let timerInterval;
+
+  // ── REDIRECT IF NOT REGISTERED ──
+  const teamId   = localStorage.getItem("teamId");
+  const teamName = localStorage.getItem("teamName");
+  if (!teamId) window.location.href = "index.html";
+
+  // ── TOKEN CHECK ──
+  // Allow access if: (1) correct token in URL, OR (2) team is registered and currentLevel >= this level
+  const token = new URLSearchParams(window.location.search).get("token");
+  const currentLevel = parseInt(localStorage.getItem("currentLevel") || "0");
+  if (token !== VALID_TOKEN && currentLevel < LEVEL) {
+    document.getElementById("accessDenied").classList.add("show");
+  }
+
+  // ── TEAM TIMER ──
+  // Timer starts from when the team registered (per-team, not global)
+  let teamStart = parseInt(localStorage.getItem("teamStartTime") || "0")
+                || parseInt(localStorage.getItem("eventStart") || "0");
+  if (!teamStart && teamId) {
+    // Fallback: set timer start to now if team is registered but no start time exists
+    teamStart = Date.now();
+    localStorage.setItem("teamStartTime", String(teamStart));
+  }
+  if (teamStart) {
+    startTimer(teamStart);
+  }
+
+  // ── TIMER ──
+  function startTimer(globalStart) {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      document.getElementById("timerDisplay").textContent =
+        formatTime(Math.floor((Date.now() - globalStart) / 1000));
+    }, 1000);
+  }
+
+  // ── RESTORE LETTERS ──
+  renderLetterTiles("tile", "bigTile");
+
+  // ── CHECK IF ALREADY COMPLETED ──
+  if (currentLevel > LEVEL) {
+    levelSolved = true;
+    document.getElementById("unlockScreen").classList.add("show");
+  }
+
+  // ── CHECK ANSWER ──
+  async function checkAnswer() {
+    if (levelSolved) return;
+    const input    = document.getElementById("answerInput");
+    const feedback = document.getElementById("answerFeedback");
+    const userAns  = input.value.trim().toUpperCase();
+    if (!userAns) return;
+
+    if (userAns === CORRECT_ANS) {
+      levelSolved = true;
+      feedback.className   = "answer-feedback correct";
+      feedback.textContent = "✓ CORRECT. Logging progress...";
+
+      // Add letter & save
+      const letters = addLetter(LETTER);
+      localStorage.setItem("currentLevel", String(LEVEL + 1));
+
+      // Update tiles
+      const idx = letters.length - 1;
+      const mini = document.getElementById(`tile${idx}`);
+      const big  = document.getElementById(`bigTile${idx}`);
+      if (mini) { mini.textContent = LETTER; mini.classList.add("lit"); }
+      if (big)  { big.textContent  = LETTER; big.classList.add("revealed"); }
+
+      // Log to Google Sheets
+      await logToSheet({
+        teamId,
+        teamName,
+        level:  LEVEL,
+        letter: LETTER,
+        action: "level_complete"
+      });
+
+      // Show unlock screen
+      setTimeout(() => {
+        document.getElementById("unlockScreen").classList.add("show");
+      }, 1000);
+
+    } else {
+      input.classList.remove("shake");
+      void input.offsetWidth;
+      input.classList.add("shake");
+      feedback.className   = "answer-feedback wrong";
+      feedback.textContent = "✗ Incorrect. Decrypt the message carefully and try again.";
+      setTimeout(() => input.classList.remove("shake"), 500);
+    }
+  }
+
+  document.getElementById("answerInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") checkAnswer();
+  });
+
+  // ── HINTS ──
+  function showHint() {
+    if (hintsUsed >= HINTS.length) return;
+    const hintText  = document.getElementById("hintText");
+    const hintsLeft = document.getElementById("hintsLeft");
+    const hintBtn   = document.getElementById("hintBtn");
+    hintText.textContent = `HINT ${hintsUsed + 1}: ${HINTS[hintsUsed]}`;
+    hintText.classList.add("show");
+    hintsUsed++;
+    hintsLeft.textContent = HINTS.length - hintsUsed;
+    if (hintsUsed >= HINTS.length) { hintBtn.disabled = true; hintBtn.textContent = "NO HINTS LEFT"; }
+  }
+</script>
+</body>
+</html>

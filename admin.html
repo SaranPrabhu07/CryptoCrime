@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Crypto Crime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:            #eaf4fd;
+      --bg2:           #d4ebf8;
+      --card:          #ffffff;
+      --blue:          #0077cc;
+      --blue-dim:      #0055aa;
+      --blue-light:    #e0f0ff;
+      --blue-glow:     rgba(0,119,204,0.15);
+      --cyan:          #0099dd;
+      --red:           #cc2200;
+      --yellow:        #cc8800;
+      --green-col:     #007733;
+      --text:          #1a2a3a;
+      --text-dim:      #5a7a9a;
+      --border:        rgba(0,119,204,0.2);
+      --border-bright: rgba(0,119,204,0.45);
+      --font-mono:     'Share Tech Mono', monospace;
+      --font-display:  'Orbitron', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(0,119,204,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(0,153,221,0.05) 0%, transparent 55%);
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 2rem;
+      background: rgba(255,255,255,0.95);
+      border-bottom: 2px solid var(--border-bright);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0,119,204,0.1);
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 0.95rem; font-weight: 900; color: var(--blue); text-decoration: none; letter-spacing: 0.12em; }
+    .nav-logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-badge { font-size: 0.65rem; padding: 0.25rem 0.75rem; background: var(--blue); color: white; border-radius: 2px; letter-spacing: 0.1em; }
+
+    /* LOGIN GATE */
+    #loginGate {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border-bright);
+      border-top: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      width: 100%; max-width: 360px;
+      box-shadow: 0 8px 40px rgba(0,119,204,0.12);
+      text-align: center;
+    }
+    .login-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .login-title { font-family: var(--font-display); font-size: 0.95rem; font-weight: 900; color: var(--blue); letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .login-sub { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 2rem; }
+
+    .login-field { text-align: left; margin-bottom: 1rem; }
+    .login-label { display: block; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.4rem; }
+    .login-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border-bright);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .login-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,119,204,0.15); }
+    .login-input.shake { animation: shake 0.4s ease; border-color: var(--red) !important; }
+
+    .login-error { font-size: 0.7rem; color: var(--red); margin-top: 0.4rem; display: none; text-align: left; }
+    .login-btn {
+      width: 100%; padding: 0.9rem;
+      background: var(--blue); color: white;
+      border: none; border-radius: 4px;
+      font-family: var(--font-display);
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.15em; cursor: pointer;
+      transition: all 0.2s; margin-top: 0.5rem;
+    }
+    .login-btn:hover { background: var(--blue-dim); box-shadow: 0 4px 20px rgba(0,119,204,0.3); transform: translateY(-1px); }
+    .login-btn:active { transform: translateY(0); }
+    .login-footer { font-size: 0.6rem; color: var(--text-dim); margin-top: 1.5rem; letter-spacing: 0.1em; }
+
+    /* ADMIN PANEL */
+    .admin-wrap { max-width: 950px; margin: 0 auto; padding: 6rem 2rem 4rem; }
+
+    .page-label { font-size: 0.62rem; letter-spacing: 0.35em; color: var(--cyan); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .page-title { font-family: var(--font-display); font-size: clamp(1.4rem,4vw,2rem); color: var(--blue); font-weight: 900; margin-bottom: 0.75rem; }
+    .page-divider { width: 50px; height: 3px; background: linear-gradient(90deg, var(--blue), transparent); margin-bottom: 2rem; }
+
+    /* START CARD */
+    .start-card {
+      background: var(--card);
+      border: 1px solid var(--border-bright);
+      border-top: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0,119,204,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .event-status-label { font-size: 0.62rem; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .event-status-text { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 1.5rem; }
+    .event-status-text.idle   { color: var(--text-dim); }
+    .event-status-text.active { color: var(--green-col); }
+
+    #startBtn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.75rem; padding: 1.4rem 5rem;
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 900;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      background: linear-gradient(135deg, #00aa44, #007733);
+      color: white; border: none; border-radius: 6px; cursor: pointer;
+      box-shadow: 0 6px 30px rgba(0,150,60,0.35), 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+    }
+    #startBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,150,60,0.5); }
+    #startBtn:active { transform: translateY(0); }
+    #startBtn.running { background: linear-gradient(135deg, #dd2200, #aa1100); box-shadow: 0 6px 30px rgba(200,30,0,0.35); }
+    #startBtn.running:hover { box-shadow: 0 10px 40px rgba(200,30,0,0.5); }
+
+    .big-timer { font-family: var(--font-display); font-size: clamp(2.5rem,8vw,4rem); font-weight: 900; color: var(--blue); letter-spacing: 0.1em; margin: 1.25rem 0 0.5rem; display: none; }
+    .big-timer.show { display: block; }
+    .start-info { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.75rem; display: none; }
+    .start-info.show { display: block; }
+    .start-info span { color: var(--blue); font-weight: bold; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; box-shadow: 0 2px 10px rgba(0,119,204,0.05); transition: box-shadow 0.2s; }
+    .stat-card:hover { box-shadow: 0 4px 20px rgba(0,119,204,0.1); }
+    .stat-num { font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: var(--blue); line-height: 1; }
+    .stat-lbl { font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.4rem; }
+
+    /* TABLE */
+    .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,119,204,0.06); margin-bottom: 1.5rem; }
+    .table-head-row { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--blue-light); }
+    .table-head-title { font-family: var(--font-display); font-size: 0.72rem; color: var(--blue); font-weight: 700; letter-spacing: 0.1em; }
+    .refresh-btn { background: white; border: 1px solid var(--border-bright); color: var(--blue); font-family: var(--font-mono); font-size: 0.65rem; padding: 0.3rem 0.9rem; cursor: pointer; border-radius: 4px; letter-spacing: 0.08em; transition: all 0.2s; }
+    .refresh-btn:hover { background: var(--blue); color: white; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    th { padding: 0.65rem 1rem; text-align: left; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg); }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--blue-light); }
+    .finished-row td { background: rgba(0,180,80,0.04); }
+    .lvl-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; }
+    .lvl-badge.l0 { background: #f0f0f0; color: #aaa; }
+    .lvl-badge.l1,.lvl-badge.l2 { background: #e0f7e9; color: #007733; border: 1px solid #aaddbb; }
+    .lvl-badge.l3,.lvl-badge.l4 { background: #fff3cd; color: #cc8800; border: 1px solid #ffcc66; }
+    .lvl-badge.l5,.lvl-badge.l6 { background: #cce5ff; color: #0066bb; border: 1px solid #99ccee; }
+    .lvl-badge.done { background: var(--green-col); color: white; }
+    .letters-row { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; color: var(--blue); }
+    .letters-row .empty { color: #ccc; }
+    .badge-done { font-size: 0.58rem; padding: 0.2rem 0.6rem; background: #e0f7e9; color: var(--green-col); border: 1px solid #aaddbb; border-radius: 3px; letter-spacing: 0.08em; }
+    .badge-progress { font-size: 0.58rem; color: var(--text-dim); }
+    .team-id { color: var(--cyan); font-size: 0.72rem; letter-spacing: 0.1em; }
+    .no-data { text-align: center; padding: 3rem 2rem; color: var(--text-dim); font-size: 0.78rem; line-height: 1.8; }
+
+    /* RESET */
+    .reset-card { background: white; border: 1px solid rgba(200,30,0,0.2); border-left: 4px solid var(--red); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .reset-card h3 { font-family: var(--font-display); font-size: 0.75rem; color: var(--red); margin-bottom: 0.3rem; letter-spacing: 0.1em; }
+    .reset-card p { font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; }
+    .reset-btn { background: none; border: 1.5px solid var(--red); color: var(--red); font-family: var(--font-mono); font-size: 0.72rem; padding: 0.6rem 1.5rem; cursor: pointer; border-radius: 4px; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
+    .reset-btn:hover { background: var(--red); color: white; }
+
+    /* ANIMATIONS */
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+    @media(max-width:640px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      #startBtn { padding: 1.2rem 2.5rem; font-size: 1rem; }
+      th:nth-child(4),td:nth-child(4) { display: none; }
+      .reset-card { flex-direction: column; }
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="loginGate">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">ADMIN ACCESS</div>
+    <div class="login-sub">// CRYPTO CRIME · MINDKRAFT</div>
+
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input type="text" class="login-input" id="usernameInput"
+        placeholder="Enter username"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+    </div>
+
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input type="password" class="login-input" id="passwordInput"
+        placeholder="Enter password"
+        autocomplete="off"/>
+      <div class="login-error" id="loginError">⚠ Invalid username or password.</div>
+    </div>
+
+    <button class="login-btn" id="loginBtn">↳ LOGIN</button>
+    <div class="login-footer">MINDKRAFT · CRYPTO CRIME · RESTRICTED</div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="adminNav" style="display:none;">
+  <a href="index.html" class="nav-logo">CRYPTO<span>CRIME</span></a>
+  <div class="nav-links">
+    <a href="index.html">Main Site</a>
+    <a href="tools.html">Tools</a>
+  </div>
+  <span class="nav-badge">ADMIN</span>
+</nav>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none;">
+  <div class="admin-wrap">
+
+    <div class="page-label">// Control Room</div>
+    <h1 class="page-title">Event Dashboard</h1>
+    <div class="page-divider"></div>
+
+    <!-- START CARD -->
+    <div class="start-card">
+      <div class="event-status-label">Event Status</div>
+      <div class="event-status-text idle" id="eventStatusText">⏸ NOT STARTED</div>
+      <div class="big-timer" id="bigTimer">00:00:00</div>
+      <button id="startBtn">
+        <span id="startBtnIcon">▶</span>
+        <span id="startBtnText">START EVENT</span>
+      </button>
+      <div class="start-info" id="startInfo">
+        Started at <span id="startTimeDisp">—</span>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="statReg">0</div><div class="stat-lbl">Registered</div></div>
+      <div class="stat-card"><div class="stat-num" id="statActive">0</div><div class="stat-lbl">Active</div></div>
+      <div class="stat-card"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">Finished</div></div>
+      <div class="stat-card"><div class="stat-num" id="statLeader" style="font-size:1rem;padding-top:0.3rem;">—</div><div class="stat-lbl">Leading Team</div></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="table-head-title">📋 Live Team Tracker</div>
+        <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Team ID</th><th>Team Name</th><th>Level</th>
+              <th>Letters</th><th>Time</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="teamBody">
+            <tr><td colspan="6" class="no-data">
+              No teams yet.<br/>
+              <span style="font-size:0.65rem;">Check your Google Sheet for live data from all devices.</span>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <div class="reset-card">
+      <div>
+        <h3>⚠ DANGER ZONE</h3>
+        <p>Stops the event timer and clears all local progress.<br/>Use only after the event ends or for a test run.</p>
+      </div>
+      <button class="reset-btn" id="resetBtn">Reset Event</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── CREDENTIALS ──
+  const ADMIN_USER = "Saran";
+  const ADMIN_PASS = "123456";
+
+  // ── WIRE UP BUTTONS (avoids inline onclick issues) ──
+  document.getElementById("loginBtn").addEventListener("click", doLogin);
+  document.getElementById("startBtn").addEventListener("click", handleStartStop);
+  document.getElementById("refreshBtn").addEventListener("click", refreshTable);
+  document.getElementById("resetBtn").addEventListener("click", resetEvent);
+
+  document.getElementById("usernameInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") document.getElementById("passwordInput").focus();
+  });
+  document.getElementById("passwordInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") doLogin();
+  });
+
+  // ── LOGIN ──
+  function doLogin() {
+    var user = document.getElementById("usernameInput").value.trim();
+    var pass = document.getElementById("passwordInput").value.trim();
+    var err  = document.getElementById("loginError");
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      document.getElementById("loginGate").style.display  = "none";
+      document.getElementById("adminNav").style.display   = "flex";
+      document.getElementById("adminPanel").style.display = "block";
+      initAdmin();
+    } else {
+      err.style.display = "block";
+      var inputs = document.querySelectorAll(".login-input");
+      inputs.forEach(function(inp) {
+        inp.classList.remove("shake");
+        void inp.offsetWidth;
+        inp.classList.add("shake");
+        setTimeout(function() { inp.classList.remove("shake"); }, 450);
+      });
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("passwordInput").focus();
+    }
+  }
+
+  // ── HELPERS ──
+  function formatTime(seconds) {
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    return pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  // ── INIT ──
+  var timerInterval = null;
+
+  function initAdmin() {
+    var saved = localStorage.getItem("eventStart");
+    if (saved) setRunningUI(parseInt(saved));
+    refreshTable();
+    setInterval(refreshTable, 15000);
+  }
+
+  // ── START / STOP ──
+  function handleStartStop() {
+    var existing = localStorage.getItem("eventStart");
+    if (!existing) {
+      var now = Date.now();
+      localStorage.setItem("eventStart", String(now));
+      setRunningUI(now);
+    } else {
+      if (confirm("Stop the event timer?")) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        localStorage.removeItem("eventStart");
+        setIdleUI();
+      }
+    }
+  }
+
+  function setRunningUI(startMs) {
+    document.getElementById("startBtn").classList.add("running");
+    document.getElementById("startBtnIcon").textContent  = "■";
+    document.getElementById("startBtnText").textContent  = "STOP EVENT";
+    document.getElementById("eventStatusText").textContent = "▶ EVENT RUNNING";
+    document.getElementById("eventStatusText").className = "event-status-text active";
+    document.getElementById("bigTimer").classList.add("show");
+    document.getElementById("startInfo").classList.add("show");
+    document.getElementById("startTimeDisp").textContent = new Date(startMs).toLocaleTimeString("en-IN");
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      document.getElementById("bigTimer").textContent =
+        formatTime(Math.floor((Date.now() - startMs) / 1000));
+    }, 1000);
+  }
+
+  function setIdleUI() {
+    document.getElementById("startBtn").classList.remove("running");
+    document.getElementById("startBtnIcon").textContent  = "▶";
+    document.getElementById("startBtnText").textContent  = "START EVENT";
+    document.getElementById("eventStatusText").textContent = "⏸ NOT STARTED";
+    document.getElementById("eventStatusText").className = "event-status-text idle";
+    document.getElementById("bigTimer").classList.remove("show");
+    document.getElementById("bigTimer").textContent = "00:00:00";
+    document.getElementById("startInfo").classList.remove("show");
+  }
+
+  // ── TABLE ──
+  function refreshTable() {
+    var tbody      = document.getElementById("teamBody");
+    var eventStart = parseInt(localStorage.getItem("eventStart") || "0");
+    var teams      = [];
+
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.startsWith("team_")) {
+        try { teams.push(JSON.parse(localStorage.getItem(key))); } catch(e) {}
+      }
+    }
+
+    var thisId = localStorage.getItem("teamId");
+    if (thisId && !teams.find(function(t) { return t.teamId === thisId; })) {
+      teams.push({
+        teamId:           thisId,
+        teamName:         localStorage.getItem("teamName") || "—",
+        currentLevel:     parseInt(localStorage.getItem("currentLevel") || "1"),
+        collectedLetters: JSON.parse(localStorage.getItem("collectedLetters") || "[]"),
+        finishedAt:       localStorage.getItem("finishedAt") || null
+      });
+    }
+
+    var finished = teams.filter(function(t) { return t.finishedAt || parseInt(t.currentLevel) > 6; });
+    document.getElementById("statReg").textContent    = teams.length;
+    document.getElementById("statActive").textContent = teams.length - finished.length;
+    document.getElementById("statDone").textContent   = finished.length;
+    if (teams.length) {
+      var leader = teams.slice().sort(function(a,b) { return parseInt(b.currentLevel) - parseInt(a.currentLevel); })[0];
+      var lname  = leader.teamName;
+      document.getElementById("statLeader").textContent = lname.length > 9 ? lname.slice(0,9)+"…" : lname;
+    }
+
+    if (!teams.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="no-data">No team data on this device yet.<br/><span style="font-size:0.65rem;">All activity is logged to your Google Sheet in real time.</span></td></tr>';
+      return;
+    }
+
+    teams.sort(function(a,b) { return parseInt(b.currentLevel) - parseInt(a.currentLevel); });
+
+    tbody.innerHTML = teams.map(function(team) {
+      var lvl     = parseInt(team.currentLevel) || 1;
+      var letters = team.collectedLetters || [];
+      var isDone  = team.finishedAt || lvl > 6;
+      var bCls    = isDone ? "done" : "l" + Math.min(lvl, 6);
+      var bTxt    = isDone ? "✓" : lvl;
+
+      var letHtml = Array.from({length:5}, function(_,i) {
+        return letters[i] ? "<span>" + letters[i] + "</span>" : '<span class="empty">_</span>';
+      }).join("");
+
+      var timeHtml = "<span style='color:#ccc'>—</span>";
+      if (eventStart && team.finishedAt) {
+        var secs = Math.floor((parseInt(team.finishedAt) - eventStart) / 1000);
+        timeHtml = '<span style="color:var(--green-col);font-weight:bold">' + formatTime(secs) + '</span>';
+      }
+
+      return '<tr class="' + (isDone ? "finished-row" : "") + '">'
+        + '<td class="team-id">' + team.teamId + '</td>'
+        + '<td>' + team.teamName + '</td>'
+        + '<td><span class="lvl-badge ' + bCls + '">' + bTxt + '</span></td>'
+        + '<td><div class="letters-row">' + letHtml + '</div></td>'
+        + '<td>' + timeHtml + '</td>'
+        + '<td>' + (isDone ? '<span class="badge-done">FINISHED</span>' : '<span class="badge-progress">In Progress</span>') + '</td>'
+        + '</tr>';
+    }).join("");
+  }
+
+  // ── RESET ──
+  function resetEvent() {
+    if (!confirm("Reset the event? This clears the timer from this device.")) return;
+    if (!confirm("Are you absolutely sure? This cannot be undone.")) return;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    ["eventStart","teamId","teamName","currentLevel","collectedLetters","finishedAt"]
+      .forEach(function(k) { localStorage.removeItem(k); });
+    var toRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.startsWith("team_")) toRemove.push(k);
+    }
+    toRemove.forEach(function(k) { localStorage.removeItem(k); });
+    setIdleUI();
+    refreshTable();
+    alert("Event reset complete.");
+  }
+</script>
+</body>
+</html>
