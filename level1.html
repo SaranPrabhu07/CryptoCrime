@@ -11,18 +11,21 @@
 <!-- UNLOCK SCREEN -->
 <div class="unlock-screen" id="unlockScreen">
   <div class="unlock-title">📍 LOCATION UNLOCKED</div>
+
   <div class="letter-earned">
     <div class="letter-earned-label">LETTER COLLECTED</div>
     <div class="letter-earned-char">R</div>
   </div>
+
   <div class="unlock-location">FOOD PROCESSING DEPARTMENT</div>
+
   <div class="unlock-instruction">
-    Head to the <strong style="color:var(--cyan)">Food Processing Department</strong> on campus.<br/>
-    Find the QR code hidden at the location.<br/>
-    Scan it to access <strong style="color:var(--green)">Level 2</strong>.
-    <br/><br/>
+    You've cracked the first cipher.<br/><br/>
+    Now <strong style="color:var(--cyan)">head to the Food Processing Department</strong> on campus.<br/>
+    A QR code is hidden there — find it and scan it to begin Round 2.<br/><br/>
     <span style="color:var(--yellow);font-size:0.72rem;">⚠ Do not share the QR with other teams.</span>
   </div>
+
   <button class="btn btn-outline"
     onclick="document.getElementById('unlockScreen').classList.remove('show')"
     style="margin-top:0.5rem;">
@@ -126,7 +129,6 @@
   const LEVEL       = 1;
   const CORRECT_ANS = "FOOD PROCESSING DEPARTMENT";
   const LETTER      = "R";
-  const LEVEL2_BASE = "https://cryptocrime-level2.vercel.app";
 
   const HINTS = [
     "ROT13 shifts every letter by 13 positions. A↔N, B↔O, C↔P... Use the ROT13 tool on the Tools page.",
@@ -142,17 +144,6 @@
 
   // Restore letters
   renderLetterTiles("", "bigTile");
-
-  // Build next level URL passing team data
-  function buildNextURL() {
-    const letters = localStorage.getItem("collectedLetters") || "[]";
-    const params  = new URLSearchParams({
-      teamId:           teamId || "",
-      teamName:         teamName || "",
-      collectedLetters: letters
-    });
-    return `${LEVEL2_BASE}?${params.toString()}`;
-  }
 
   async function checkAnswer() {
     if (levelSolved) return;
@@ -175,8 +166,8 @@
 
       await logToSheet({ teamId, teamName, level: LEVEL, letter: LETTER, action: "level_complete" });
 
+      // Show unlock screen with next location instructions
       setTimeout(() => {
-        document.getElementById("goToLevel2Btn").href = buildNextURL();
         document.getElementById("unlockScreen").classList.add("show");
       }, 1000);
 
