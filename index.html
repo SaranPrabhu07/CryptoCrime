@@ -83,16 +83,15 @@
   <h2 class="section-title">The Hunt</h2>
   <div class="section-divider"></div>
   <div class="how-grid">
-    <div class="how-item"><div class="how-num">01</div><div class="how-title">Register</div><div class="how-desc">Form your team and enter your pre-assigned Team ID. Wait for the organiser's start signal.</div></div>
+    <div class="how-item"><div class="how-num">01</div><div class="how-title">Register</div><div class="how-desc">Form your team and enter your pre-assigned Team ID.</div></div>
     <div class="how-item"><div class="how-num">02</div><div class="how-title">Decode</div><div class="how-desc">Each level presents a cryptographic puzzle. Crack it to reveal the next campus location.</div></div>
     <div class="how-item"><div class="how-num">03</div><div class="how-title">Move</div><div class="how-desc">Head to the location. Find the QR code hidden there. Scan it to unlock the next level.</div></div>
-    <div class="how-item"><div class="how-num">04</div><div class="how-title">Collect</div><div class="how-desc">Each location holds a letter. Collect all 5 letters across the levels to reveal the criminal's name.</div></div>
-    <div class="how-item"><div class="how-num">05</div><div class="how-title">Expose</div><div class="how-desc">Arrange the letters. Name the criminal. The fastest team to crack the case wins.</div></div>
+    <div class="how-item"><div class="how-num">04</div><div class="how-title">Collect</div><div class="how-desc">Each location holds a letter. Collect all 5 letters to reveal the criminal's name.</div></div>
+    <div class="how-item"><div class="how-num">05</div><div class="how-title">Expose</div><div class="how-desc">Arrange the letters. Name the criminal. The fastest team wins.</div></div>
   </div>
   <div class="warning-box">
     <strong>⚠ WARNING:</strong> All puzzles use real cryptographic techniques.
     Use the <a href="tools.html" style="color:var(--red)">Crypto Tools</a> page to access decoders.
-    Hints cost time. Choose wisely.
   </div>
 </section>
 
@@ -136,12 +135,16 @@
         <div class="success-desc">
           Your team has been registered successfully.<br/>
           Head to <strong>ECE Gallery Hall</strong> for the event briefing.<br/>
-          The investigation begins on the organiser's signal.
+          The organiser will signal when to begin.
         </div>
         <br/>
-        <div class="btn-group" style="justify-content:center;">
-          <a href="level1.html?token=ROT1X" class="btn btn-primary" style="margin-top:0.5rem;">↳ Begin Level 1</a>
-          <a href="tools.html" class="btn btn-outline" style="margin-top:0.5rem;">⌘ Study the Tools</a>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;margin-top:0.5rem;">
+          <a href="level1.html" class="btn btn-primary" style="width:100%;justify-content:center;">
+            ↳ Go to Level 1
+          </a>
+          <a href="tools.html" class="btn btn-outline" style="width:100%;justify-content:center;">
+            ⌘ Study the Tools
+          </a>
         </div>
       </div>
 
@@ -152,7 +155,7 @@
   </div>
 
   <div class="already-registered">
-    Already registered? <a href="level1.html?token=ROT1X">Continue to Level 1 →</a>
+    Already registered? <a href="level1.html">Continue to Level 1 →</a>
   </div>
 </section>
 
@@ -171,7 +174,6 @@
     const idErr     = document.getElementById("idError");
     const btn       = document.getElementById("registerBtn");
 
-    // Reset
     nameInput.classList.remove("error"); nameErr.style.display = "none";
     idInput.classList.remove("error");   idErr.style.display   = "none";
 
@@ -188,10 +190,8 @@
       idErr.style.display = "block";
       valid = false;
     }
-
     if (!valid) return;
 
-    // Check if this ID already registered in localStorage
     const existing = localStorage.getItem("teamId");
     if (existing && existing !== id) {
       idInput.classList.add("error");
@@ -203,21 +203,12 @@
     btn.innerHTML = '<span class="spinner"></span> Registering...';
     btn.disabled  = true;
 
-    // Save to localStorage
-    localStorage.setItem("teamId",   id);
-    localStorage.setItem("teamName", name);
-    localStorage.setItem("currentLevel", "1");
+    localStorage.setItem("teamId",           id);
+    localStorage.setItem("teamName",         name);
+    localStorage.setItem("currentLevel",     "1");
     localStorage.setItem("collectedLetters", "[]");
-    localStorage.setItem("teamStartTime", String(Date.now()));
 
-    // Log to Google Sheets
-    await logToSheet({
-      teamId:   id,
-      teamName: name,
-      level:    0,
-      letter:   "-",
-      action:   "registered"
-    });
+    await logToSheet({ teamId: id, teamName: name, level: 0, letter: "-", action: "registered" });
 
     showSuccess(id, name);
   }
@@ -228,7 +219,6 @@
     document.getElementById("successId").textContent  = id + " · " + name;
   }
 
-  // Restore session
   window.addEventListener("DOMContentLoaded", () => {
     const id   = localStorage.getItem("teamId");
     const name = localStorage.getItem("teamName");

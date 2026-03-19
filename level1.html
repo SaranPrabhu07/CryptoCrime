@@ -8,17 +8,7 @@
 </head>
 <body>
 
-<!-- ACCESS DENIED -->
-<div class="access-denied" id="accessDenied">
-  <div style="font-size:4rem;">🔒</div>
-  <div class="denied-title">ACCESS DENIED</div>
-  <div class="denied-desc">You must physically be at the starting location and scan the QR code to access this level.</div>
-  <a href="index.html" class="btn btn-outline" style="margin-top:1rem;">← Back to Base</a>
-</div>
-
-
-
-<!-- QR UNLOCK SCREEN -->
+<!-- UNLOCK SCREEN -->
 <div class="unlock-screen" id="unlockScreen">
   <div class="unlock-title">📍 LOCATION UNLOCKED</div>
   <div class="letter-earned">
@@ -27,15 +17,18 @@
   </div>
   <div class="unlock-location">FOOD PROCESSING DEPARTMENT</div>
   <div class="unlock-instruction">
-    Head to the <strong style="color:var(--cyan)">Food Processing Department</strong> on campus.
-    Find the QR code hidden at the location. Scan it to access <strong style="color:var(--green)">Level 2</strong>.
+    Head to the <strong style="color:var(--cyan)">Food Processing Department</strong> on campus.<br/>
+    Find the QR code hidden at the location.<br/>
+    Scan it to access <strong style="color:var(--green)">Level 2</strong>.
     <br/><br/>
     <span style="color:var(--yellow);font-size:0.72rem;">⚠ Do not share the QR with other teams.</span>
   </div>
-
-
-
-  <button class="btn btn-outline" onclick="document.getElementById('unlockScreen').classList.remove('show')">
+  <a class="btn btn-primary" id="goToLevel2Btn" href="#" style="margin-top:0.5rem;">
+    → Proceed to Level 2
+  </a>
+  <button class="btn btn-outline"
+    onclick="document.getElementById('unlockScreen').classList.remove('show')"
+    style="margin-top:0.25rem;">
     ← Back to Level 1
   </button>
 </div>
@@ -50,21 +43,8 @@
   <div class="nav-status"><div class="status-dot"></div>LVL 1/6</div>
 </nav>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="top-bar-timer" id="timerDisplay">00:00:00</div>
-  <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;">LEVEL 1 OF 6 — ROT13</div>
-  <div class="top-bar-tiles">
-    <div class="mini-tile" id="tile0">?</div>
-    <div class="mini-tile" id="tile1">?</div>
-    <div class="mini-tile" id="tile2">?</div>
-    <div class="mini-tile" id="tile3">?</div>
-    <div class="mini-tile" id="tile4">?</div>
-  </div>
-</div>
-
 <!-- MAIN -->
-<div class="level-wrap">
+<div class="level-wrap" style="padding-top:5rem;">
 
   <div class="progress-bar-wrap">
     <div class="progress-label"><span>INVESTIGATION PROGRESS</span><span>LEVEL 1 / 6</span></div>
@@ -99,7 +79,6 @@
 
       <div class="file-section">
         <div class="file-section-label">Intercepted Transmission</div>
-        <!-- ROT13 of "FOOD PROCESSING DEPARTMENT" -->
         <div class="encoded-message">SBBQ CEBPRFFVAT QRCNEGZRAG</div>
         <p style="font-size:0.68rem;color:var(--text-dim);margin-top:0.6rem;letter-spacing:0.05em;">
           ↳ Use the <a href="tools.html" target="_blank" style="color:var(--cyan)">ROT13 tool</a> on the Tools page to decode this.
@@ -147,11 +126,11 @@
 <script>
   startBinaryRain(0.05);
 
-  // ── CONFIG ──
-  const LEVEL        = 1;
-  const VALID_TOKEN  = LEVEL_TOKENS[LEVEL];
-  const CORRECT_ANS  = "FOOD PROCESSING DEPARTMENT";
-  const LETTER       = "R";
+  const LEVEL       = 1;
+  const CORRECT_ANS = "FOOD PROCESSING DEPARTMENT";
+  const LETTER      = "R";
+  const LEVEL2_BASE = "https://cryptocrime-level2.vercel.app";
+
   const HINTS = [
     "ROT13 shifts every letter by 13 positions. A↔N, B↔O, C↔P... Use the ROT13 tool on the Tools page.",
     "The answer is a department name on campus. After decoding you'll know exactly where to go."
@@ -159,53 +138,25 @@
 
   let hintsUsed   = 0;
   let levelSolved = false;
-  let timerInterval;
 
-  // ── REDIRECT IF NOT REGISTERED ──
   const teamId   = localStorage.getItem("teamId");
   const teamName = localStorage.getItem("teamName");
   if (!teamId) window.location.href = "index.html";
 
-  // ── TOKEN CHECK ──
-  // Allow access if: (1) correct token in URL, OR (2) team is registered and currentLevel >= this level
-  const token = new URLSearchParams(window.location.search).get("token");
-  const currentLevel = parseInt(localStorage.getItem("currentLevel") || "0");
-  if (token !== VALID_TOKEN && currentLevel < LEVEL) {
-    document.getElementById("accessDenied").classList.add("show");
+  // Restore letters
+  renderLetterTiles("", "bigTile");
+
+  // Build next level URL passing team data
+  function buildNextURL() {
+    const letters = localStorage.getItem("collectedLetters") || "[]";
+    const params  = new URLSearchParams({
+      teamId:           teamId || "",
+      teamName:         teamName || "",
+      collectedLetters: letters
+    });
+    return `${LEVEL2_BASE}?${params.toString()}`;
   }
 
-  // ── TEAM TIMER ──
-  // Timer starts from when the team registered (per-team, not global)
-  let teamStart = parseInt(localStorage.getItem("teamStartTime") || "0")
-                || parseInt(localStorage.getItem("eventStart") || "0");
-  if (!teamStart && teamId) {
-    // Fallback: set timer start to now if team is registered but no start time exists
-    teamStart = Date.now();
-    localStorage.setItem("teamStartTime", String(teamStart));
-  }
-  if (teamStart) {
-    startTimer(teamStart);
-  }
-
-  // ── TIMER ──
-  function startTimer(globalStart) {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      document.getElementById("timerDisplay").textContent =
-        formatTime(Math.floor((Date.now() - globalStart) / 1000));
-    }, 1000);
-  }
-
-  // ── RESTORE LETTERS ──
-  renderLetterTiles("tile", "bigTile");
-
-  // ── CHECK IF ALREADY COMPLETED ──
-  if (currentLevel > LEVEL) {
-    levelSolved = true;
-    document.getElementById("unlockScreen").classList.add("show");
-  }
-
-  // ── CHECK ANSWER ──
   async function checkAnswer() {
     if (levelSolved) return;
     const input    = document.getElementById("answerInput");
@@ -218,28 +169,17 @@
       feedback.className   = "answer-feedback correct";
       feedback.textContent = "✓ CORRECT. Logging progress...";
 
-      // Add letter & save
       const letters = addLetter(LETTER);
       localStorage.setItem("currentLevel", String(LEVEL + 1));
 
-      // Update tiles
       const idx = letters.length - 1;
-      const mini = document.getElementById(`tile${idx}`);
-      const big  = document.getElementById(`bigTile${idx}`);
-      if (mini) { mini.textContent = LETTER; mini.classList.add("lit"); }
-      if (big)  { big.textContent  = LETTER; big.classList.add("revealed"); }
+      const big = document.getElementById(`bigTile${idx}`);
+      if (big) { big.textContent = LETTER; big.classList.add("revealed"); }
 
-      // Log to Google Sheets
-      await logToSheet({
-        teamId,
-        teamName,
-        level:  LEVEL,
-        letter: LETTER,
-        action: "level_complete"
-      });
+      await logToSheet({ teamId, teamName, level: LEVEL, letter: LETTER, action: "level_complete" });
 
-      // Show unlock screen
       setTimeout(() => {
+        document.getElementById("goToLevel2Btn").href = buildNextURL();
         document.getElementById("unlockScreen").classList.add("show");
       }, 1000);
 
@@ -257,7 +197,6 @@
     if (e.key === "Enter") checkAnswer();
   });
 
-  // ── HINTS ──
   function showHint() {
     if (hintsUsed >= HINTS.length) return;
     const hintText  = document.getElementById("hintText");
