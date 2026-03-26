@@ -196,8 +196,10 @@
       });
     }
   }
-
+  const submitSound = new Audio("Fahhh.mp3");
   async function checkAnswer() {
+    submitSound.currentTime = 0; // restart if clicked multiple times
+    submitSound.play();
     if (levelSolved) return;
     const input    = document.getElementById("answerInput");
     const feedback = document.getElementById("answerFeedback");

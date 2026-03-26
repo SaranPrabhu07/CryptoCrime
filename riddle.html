@@ -400,8 +400,13 @@
 
   // Render any already-collected letters
   renderTwoRowTiles();
-
+  const submitSound = new Audio("Fahhh.mp3");
   async function checkAnswer() {
+
+    
+
+    submitSound.currentTime = 0;
+    submitSound.play();
     if (levelSolved) return;
 
     const input    = document.getElementById("answerInput");
