@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level 1 — Crypto Crime</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* Two-row letter tiles */
+    .letter-row-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .letter-row-label span { color: var(--green); }
+    .letter-row-label span.dim { color: var(--text-dim); }
+    .letter-tiles-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -20,17 +37,12 @@
   <div class="unlock-location">FOOD PROCESSING DEPARTMENT</div>
 
   <div class="unlock-instruction">
-    You've cracked the first cipher.<br/><br/>
+    You've cracked the ROT13 cipher.<br/><br/>
     Now <strong style="color:var(--cyan)">head to the Food Processing Department</strong> on campus.<br/>
-    A QR code is hidden there — find it and scan it to begin Round 2.<br/><br/>
-    <span style="color:var(--yellow);font-size:0.72rem;">⚠ Do not share the QR with other teams.</span>
+    A QR code is hidden there — find it and scan it to continue the investigation.<br/><br/>
+    <span style="color:var(--yellow);font-size:0.72rem;">⚠ Do not share the QR code with other teams.</span>
   </div>
 
-  <button class="btn btn-outline"
-    onclick="document.getElementById('unlockScreen').classList.remove('show')"
-    style="margin-top:0.5rem;">
-    ← Back to Level 1
-  </button>
 </div>
 
 <!-- NAVBAR -->
@@ -105,15 +117,15 @@
   </div>
   <div class="hint-text" id="hintText"></div>
 
-  <!-- LETTER TILES -->
+  <!-- LETTER TILES — TWO ROWS -->
   <div style="margin-top:2rem;text-align:center;">
-    <div style="font-size:0.62rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:0.75rem;">COLLECTED LETTERS</div>
-    <div class="letter-tiles">
-      <div class="letter-tile" id="bigTile0"><div class="redacted"></div></div>
-      <div class="letter-tile" id="bigTile1"><div class="redacted"></div></div>
-      <div class="letter-tile" id="bigTile2"><div class="redacted"></div></div>
-      <div class="letter-tile" id="bigTile3"><div class="redacted"></div></div>
-      <div class="letter-tile" id="bigTile4"><div class="redacted"></div></div>
+    <div class="letter-row-label">COLLECTED LETTERS — <span>ROW 1 (PART A)</span></div>
+    <div class="letter-tiles-row" id="row1Tiles">
+      <div class="letter-tile" id="row1Tile0"><div class="redacted"></div></div>
+    </div>
+    <div class="letter-row-label">COLLECTED LETTERS — <span>ROW 2 (PART B)</span></div>
+    <div class="letter-tiles-row" id="row2Tiles">
+      <div class="letter-tile" id="row2Tile0"><div class="redacted"></div></div>
     </div>
     <div style="font-size:0.62rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.15em;">
       Each letter brings you closer to the criminal's name.
@@ -126,7 +138,7 @@
 <script>
   startBinaryRain(0.05);
 
-  const LEVEL       = 1;
+  const LEVEL       = "1B";
   const CORRECT_ANS = "FOOD PROCESSING DEPARTMENT";
   const LETTER      = "R";
 
@@ -140,10 +152,50 @@
 
   const teamId   = localStorage.getItem("teamId");
   const teamName = localStorage.getItem("teamName");
+
+  // Anti-skip: must have registered
   if (!teamId) window.location.href = "index.html";
 
-  // Restore letters
-  renderLetterTiles("", "bigTile");
+  // Anti-skip: riddle.html must have been solved on this device first.
+  // localStorage persists across pages on the same device/browser,
+  // so a QR scan on the same phone that solved riddle.html will pass fine.
+  const currentLevel = localStorage.getItem("currentLevel");
+  if (currentLevel !== "1B" && currentLevel !== "2A") {
+    window.location.href = "riddle.html";
+  }
+
+  // Render existing collected letters
+  renderCollectedLetters();
+
+  function renderCollectedLetters() {
+    let stored = localStorage.getItem("collectedLetters");
+    let data = { row1: [], row2: [] };
+    try { data = JSON.parse(stored) || data; } catch(e) {}
+
+    // Row 1 — Part A letters
+    const row1 = document.getElementById("row1Tiles");
+    if (data.row1 && data.row1.length > 0) {
+      row1.innerHTML = "";
+      data.row1.forEach(letter => {
+        const tile = document.createElement("div");
+        tile.className = "letter-tile revealed";
+        tile.textContent = letter;
+        row1.appendChild(tile);
+      });
+    }
+
+    // Row 2 — Part B letters
+    const row2 = document.getElementById("row2Tiles");
+    if (data.row2 && data.row2.length > 0) {
+      row2.innerHTML = "";
+      data.row2.forEach(letter => {
+        const tile = document.createElement("div");
+        tile.className = "letter-tile revealed";
+        tile.textContent = letter;
+        row2.appendChild(tile);
+      });
+    }
+  }
 
   async function checkAnswer() {
     if (levelSolved) return;
@@ -157,12 +209,23 @@
       feedback.className   = "answer-feedback correct";
       feedback.textContent = "✓ CORRECT. Logging progress...";
 
-      const letters = addLetter(LETTER);
-      localStorage.setItem("currentLevel", String(LEVEL + 1));
+      // Update structured collectedLetters
+      let stored = localStorage.getItem("collectedLetters");
+      let data = { row1: [], row2: [] };
+      try { data = JSON.parse(stored) || data; } catch(e) {}
+      data.row2[0] = LETTER;
+      localStorage.setItem("collectedLetters", JSON.stringify(data));
+      localStorage.setItem("currentLevel", "2A");
 
-      const idx = letters.length - 1;
-      const big = document.getElementById(`bigTile${idx}`);
-      if (big) { big.textContent = LETTER; big.classList.add("revealed"); }
+      // Reveal tile in row 2
+      const row2 = document.getElementById("row2Tiles");
+      row2.innerHTML = "";
+      data.row2.forEach(letter => {
+        const tile = document.createElement("div");
+        tile.className = "letter-tile revealed";
+        tile.textContent = letter;
+        row2.appendChild(tile);
+      });
 
       await logToSheet({ teamId, teamName, level: LEVEL, letter: LETTER, action: "level_complete" });
 

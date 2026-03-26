@@ -139,7 +139,8 @@
         </div>
         <br/>
         <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;margin-top:0.5rem;">
-          <a href="level1.html" class="btn btn-primary" style="width:100%;justify-content:center;">
+          <!-- CHANGED: redirect to riddle.html instead of level1.html -->
+          <a href="riddle.html" class="btn btn-primary" style="width:100%;justify-content:center;">
             ↳ Go to Level 1
           </a>
           <a href="tools.html" class="btn btn-outline" style="width:100%;justify-content:center;">
@@ -155,7 +156,7 @@
   </div>
 
   <div class="already-registered">
-    Already registered? <a href="level1.html">Continue to Level 1 →</a>
+    Already registered? <a href="riddle.html">Continue to Level 1 →</a>
   </div>
 </section>
 
@@ -205,8 +206,8 @@
 
     localStorage.setItem("teamId",           id);
     localStorage.setItem("teamName",         name);
-    localStorage.setItem("currentLevel",     "1");
-    localStorage.setItem("collectedLetters", "[]");
+    localStorage.setItem("currentLevel",     "1A");
+    localStorage.setItem("collectedLetters", JSON.stringify({ row1: [], row2: [] }));
 
     await logToSheet({ teamId: id, teamName: name, level: 0, letter: "-", action: "registered" });
 

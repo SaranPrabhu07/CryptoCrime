@@ -54,22 +54,142 @@ async function logToSheet(data) {
   }
 }
 
-// ── LETTER HELPERS ──
+// ═══════════════════════════════════════════════
+//  TWO-ROW LETTER STORAGE
+//  Structure: { row1: [], row2: [] }
+//  row1 = Part A letters, row2 = Part B letters
+// ═══════════════════════════════════════════════
+
+/**
+ * Returns the full structured letter object { row1: [], row2: [] }.
+ * Handles both legacy flat-array format and new structured format.
+ */
+function getStructuredLetters() {
+  let raw = localStorage.getItem("collectedLetters");
+  if (!raw) return { row1: [], row2: [] };
+  try {
+    const parsed = JSON.parse(raw);
+    // New structured format
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return {
+        row1: Array.isArray(parsed.row1) ? parsed.row1 : [],
+        row2: Array.isArray(parsed.row2) ? parsed.row2 : []
+      };
+    }
+    // Legacy flat array — treat all as row1
+    if (Array.isArray(parsed)) {
+      return { row1: parsed, row2: [] };
+    }
+  } catch(e) {}
+  return { row1: [], row2: [] };
+}
+
+/** Save the structured letter object back to localStorage. */
+function saveStructuredLetters(data) {
+  localStorage.setItem("collectedLetters", JSON.stringify(data));
+}
+
+/** Add a letter to row1 (Part A). Skips duplicates. Returns updated data. */
+function addLetterRow1(letter) {
+  const data = getStructuredLetters();
+  if (!data.row1.includes(letter)) data.row1.push(letter);
+  saveStructuredLetters(data);
+  return data;
+}
+
+/** Add or set a letter at a specific index in row2 (Part B). Returns updated data. */
+function addLetterRow2(letter, index) {
+  const data = getStructuredLetters();
+  if (typeof index === "number") {
+    data.row2[index] = letter;
+  } else {
+    if (!data.row2.includes(letter)) data.row2.push(letter);
+  }
+  saveStructuredLetters(data);
+  return data;
+}
+
+/**
+ * Renders both rows of letter tiles onto the page.
+ * Looks for elements with IDs: row1Tile0, row1Tile1, ... and row2Tile0, row2Tile1, ...
+ * Fills in letters and adds .revealed class to lit tiles.
+ */
+function renderTwoRowTiles() {
+  const data = getStructuredLetters();
+
+  // Row 1 container (re-renders all tiles)
+  const row1Container = document.getElementById("row1Tiles");
+  if (row1Container) {
+    row1Container.innerHTML = "";
+    const totalRow1 = Math.max(data.row1.length, 1);
+    for (let i = 0; i < totalRow1; i++) {
+      const tile = document.createElement("div");
+      tile.className = "letter-tile";
+      tile.id = `row1Tile${i}`;
+      if (data.row1[i]) {
+        tile.textContent = data.row1[i];
+        tile.classList.add("revealed");
+      } else {
+        tile.innerHTML = '<div class="redacted"></div>';
+      }
+      row1Container.appendChild(tile);
+    }
+  } else {
+    // Fallback: update individual tiles by ID
+    for (let i = 0; i < 5; i++) {
+      const tile = document.getElementById(`row1Tile${i}`);
+      if (!tile) continue;
+      if (data.row1[i]) {
+        tile.textContent = data.row1[i];
+        tile.classList.add("revealed");
+      }
+    }
+  }
+
+  // Row 2 container
+  const row2Container = document.getElementById("row2Tiles");
+  if (row2Container) {
+    row2Container.innerHTML = "";
+    const totalRow2 = Math.max(data.row2.length, 1);
+    for (let i = 0; i < totalRow2; i++) {
+      const tile = document.createElement("div");
+      tile.className = "letter-tile";
+      tile.id = `row2Tile${i}`;
+      if (data.row2[i]) {
+        tile.textContent = data.row2[i];
+        tile.classList.add("revealed");
+      } else {
+        tile.innerHTML = '<div class="redacted"></div>';
+      }
+      row2Container.appendChild(tile);
+    }
+  } else {
+    // Fallback: update individual tiles by ID
+    for (let i = 0; i < 5; i++) {
+      const tile = document.getElementById(`row2Tile${i}`);
+      if (!tile) continue;
+      if (data.row2[i]) {
+        tile.textContent = data.row2[i];
+        tile.classList.add("revealed");
+      }
+    }
+  }
+}
+
+// ── LEGACY FLAT-ARRAY HELPERS (kept for backward compatibility) ──
 function getCollectedLetters() {
-  return JSON.parse(localStorage.getItem("collectedLetters") || "[]");
+  const data = getStructuredLetters();
+  return [...data.row1, ...data.row2];
 }
 
 function addLetter(letter) {
-  const letters = getCollectedLetters();
-  if (!letters.includes(letter)) {
-    letters.push(letter);
-    localStorage.setItem("collectedLetters", JSON.stringify(letters));
-  }
-  return letters;
+  // Legacy: adds to row1
+  return addLetterRow1(letter);
 }
 
 function renderLetterTiles(miniPrefix, bigPrefix) {
-  const letters = getCollectedLetters();
+  const data = getStructuredLetters();
+  const letters = [...data.row1, ...data.row2];
   for (let i = 0; i < 5; i++) {
     const mini = document.getElementById(`${miniPrefix}${i}`);
     const big  = document.getElementById(`${bigPrefix}${i}`);

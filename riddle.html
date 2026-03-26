@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 1A — Crypto Crime</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .riddle-card {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      margin-bottom: 1.5rem;
+    }
+    .riddle-header {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .riddle-case-id {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .riddle-badge {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      padding: 0.25rem 0.7rem;
+      border: 1px solid var(--yellow);
+      color: var(--yellow);
+      background: rgba(255,200,0,0.05);
+    }
+    .riddle-body { padding: 1.5rem; }
+    .riddle-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--green);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.25rem;
+    }
+    .riddle-block {
+      border-left: 2px solid var(--border);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      background: rgba(0,255,65,0.02);
+    }
+    .riddle-block-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .riddle-block-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .riddle-block-text em { color: var(--yellow); font-style: normal; }
+
+    .hint-tier {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .hint-tier-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hint-unlock-btn {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.2s;
+    }
+    .hint-unlock-btn:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+    .hint-unlock-btn:disabled { opacity: 0.4; cursor: default; }
+    .hint-content {
+      display: none;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+    .hint-content.show { display: block; }
+    .hint-content span { color: var(--cyan); }
+
+    /* ── FULL-SCREEN UNLOCK OVERLAY ── */
+    .part-unlock-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .part-unlock-screen.show { opacity: 1; pointer-events: all; }
+
+    .part-unlock-eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.5em;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+    .part-unlock-collected-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--green);
+      margin-bottom: 0.4rem;
+    }
+    .part-unlock-letter-big {
+      font-family: var(--font-display);
+      font-size: 9rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+      animation: glowPulse 2s ease infinite;
+    }
+    @keyframes glowPulse {
+      0%,100% { text-shadow: 0 0 20px rgba(0,255,65,0.4); }
+      50%      { text-shadow: 0 0 80px rgba(0,255,65,1), 0 0 120px rgba(0,255,65,0.5); }
+    }
+    .part-unlock-sublabel {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+    }
+    .part-unlock-instruction {
+      max-width: 420px;
+      width: 100%;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.9;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(0,255,247,0.25);
+      padding: 1.25rem 1.5rem;
+      background: rgba(0,255,247,0.03);
+    }
+    .part-unlock-instruction strong { color: var(--cyan); }
+
+    /* Two-row letter tiles */
+    .letter-row-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .letter-row-label span { color: var(--green); }
+    .letter-tiles-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Direction response — no "incorrect" label */
+    .direction-response {
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(0,255,247,0.2);
+      background: rgba(0,255,247,0.03);
+      font-size: 0.78rem;
+      color: var(--cyan);
+      line-height: 1.7;
+      display: none;
+      letter-spacing: 0.04em;
+    }
+    .direction-response.show { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ── FULL-SCREEN UNLOCK OVERLAY ── -->
+<div class="part-unlock-screen" id="partUnlockScreen">
+  <div class="part-unlock-eyebrow">// PART A — COMPLETE</div>
+  <div class="part-unlock-collected-label">LETTER COLLECTED</div>
+  <div class="part-unlock-letter-big">W</div>
+  <div class="part-unlock-sublabel">FIRST FRAGMENT SECURED</div>
+
+  <div class="part-unlock-instruction">
+    Your deduction is correct, Detective.<br/><br/>
+    <strong>Go to Physical Sciences Department</strong> on campus.<br/>
+    A QR code is hidden there — find it and scan it to unlock Part B.<br/><br/>
+    <span style="color:var(--yellow);font-size:0.7rem;">⚠ Do not share the QR code with other teams.</span>
+  </div>
+
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">CRYPTO<span>CRIME</span></a>
+  <div class="nav-links">
+    <a href="tools.html">Tools</a>
+    <a href="index.html">Home</a>
+  </div>
+  <div class="nav-status"><div class="status-dot"></div>LVL 1A/6</div>
+</nav>
+
+<!-- MAIN -->
+<div class="level-wrap" style="padding-top:5rem;">
+
+  <div class="progress-bar-wrap">
+    <div class="progress-label"><span>INVESTIGATION PROGRESS</span><span>LEVEL 1A / 6</span></div>
+    <div class="progress-track"><div class="progress-fill" style="width:8%"></div></div>
+  </div>
+
+  <div class="classified-banner">
+    <div class="classified-stamp">CLASSIFIED</div>
+    <div class="level-indicator">FILE 001A OF 006 &nbsp;·&nbsp; TYPE: RIDDLE / DEDUCTION</div>
+  </div>
+
+  <div class="classified-file">
+    <div class="file-header">
+      <div class="file-meta">
+        <div class="file-id">CASE #MK-2601 &nbsp;·&nbsp; EVIDENCE FILE 01-A</div>
+        <div class="file-title">The Suspect's Note</div>
+      </div>
+      <div class="file-cipher-badge">RIDDLE ENCODED</div>
+    </div>
+
+    <div class="file-body">
+      <div class="file-section">
+        <div class="file-section-label">Mission Briefing</div>
+        <p class="briefing-text">
+          A handwritten note was recovered from the suspect's last known location.
+          It does <strong>not</strong> use a cipher — it's a riddle. The suspect believed
+          no investigator would think beyond the obvious.<br/><br/>
+          Read carefully. The note contains <strong>three layers</strong> of misdirection.
+          Your instincts will betray you. Logic will not.
+        </p>
+      </div>
+
+      <div class="file-section">
+        <div class="file-section-label">Recovered Note — Suspect's Handwriting</div>
+        <div class="riddle-card">
+          <div class="riddle-header">
+            <span class="riddle-case-id">EXHIBIT A &nbsp;·&nbsp; HANDWRITTEN NOTE</span>
+            <span class="riddle-badge">3 LAYERS</span>
+          </div>
+          <div class="riddle-body">
+            <div class="riddle-title">// I am not what I cook, yet I feed what builds.</div>
+
+            <div class="riddle-block">
+              <div class="riddle-block-label">— LAYER I —</div>
+              <div class="riddle-block-text">
+                They say I smell of kitchens and <em>boiling vats</em>,<br/>
+                that I am the domain of <em>proteins and fats</em>.<br/>
+                The hungry athlete knocks on my door,<br/>
+                yet I have never plated a single meal before.
+              </div>
+            </div>
+
+            <div class="riddle-block">
+              <div class="riddle-block-label">— LAYER II —</div>
+              <div class="riddle-block-text">
+                A biologist calls me <em>edible</em>,<br/>
+                a dietician calls me <em>essential</em>,<br/>
+                a bodybuilder builds their <em>40% on me</em>.<br/>
+                Yet I have never seen a gym, a plate, or a pantry.
+              </div>
+            </div>
+
+            <div class="riddle-block">
+              <div class="riddle-block-label">— LAYER III —</div>
+              <div class="riddle-block-text">
+                I study what fuels reactions —<br/>
+                not digestion, but <em>combustion</em>.<br/>
+                I measure energy in joules, not calories.<br/>
+                My elements are on a <em>periodic table</em>,<br/>
+                not a dining table.<br/><br/>
+                I am the science of <em>matter itself</em>.<br/>
+                Where do you find me?
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANSWER SECTION -->
+      <div class="answer-section">
+        <div class="answer-label">// Submit Your Deduction</div>
+        <div class="answer-input-row">
+          <input type="text" class="answer-input" id="answerInput"
+            placeholder="WHICH DEPARTMENT..."
+            autocomplete="off" spellcheck="false"/>
+          <button class="btn btn-primary answer-submit" onclick="checkAnswer()">SUBMIT</button>
+        </div>
+        <div class="answer-feedback" id="answerFeedback"></div>
+        <!-- Direction box: shown for non-food wrong answers (no "incorrect" label) -->
+        <div class="direction-response" id="directionResponse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HINTS -->
+  <div class="hint-tier">
+    <div class="hint-tier-header">
+      <span>INTEL FRAGMENTS — CLASSIFIED</span>
+      <span style="font-size:0.6rem;color:var(--text-dim)">HINTS: <span id="hintsLeft" style="color:var(--yellow)">3</span> REMAINING</span>
+    </div>
+    <div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem;">
+
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+          <span style="font-size:0.62rem;letter-spacing:0.2em;color:var(--text-dim)">FRAGMENT 01</span>
+          <button class="hint-unlock-btn" id="hintBtn0" onclick="unlockHint(0)">DECRYPT</button>
+        </div>
+        <div class="hint-content" id="hintContent0">
+          The note mentions <span>proteins, fats, and athletes</span>. That's the trap. The suspect wants you to run to the cafeteria or food lab. Don't.
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:0.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+          <span style="font-size:0.62rem;letter-spacing:0.2em;color:var(--text-dim)">FRAGMENT 02</span>
+          <button class="hint-unlock-btn" id="hintBtn1" onclick="unlockHint(1)" disabled>LOCKED</button>
+        </div>
+        <div class="hint-content" id="hintContent1">
+          <span>"Edible biology"</span> is Layer II's trap. Proteins are studied in biology AND chemistry. Bodybuilder's 40% refers to macronutrient percentage — but the note says it studies combustion, not digestion.
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:0.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+          <span style="font-size:0.62rem;letter-spacing:0.2em;color:var(--text-dim)">FRAGMENT 03</span>
+          <button class="hint-unlock-btn" id="hintBtn2" onclick="unlockHint(2)" disabled>LOCKED</button>
+        </div>
+        <div class="hint-content" id="hintContent2">
+          <span>"Joules not calories. Periodic table not dining table. Matter itself."</span> — This is pure chemistry. The answer is a department, not a person or tool.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LETTER TILES — TWO ROWS -->
+  <div style="margin-top:2rem;text-align:center;">
+    <div class="letter-row-label">COLLECTED LETTERS — <span>ROW 1 (PART A)</span></div>
+    <div class="letter-tiles-row" id="row1Tiles">
+      <div class="letter-tile"><div class="redacted"></div></div>
+    </div>
+    <div class="letter-row-label">COLLECTED LETTERS — <span style="color:var(--text-dim)">ROW 2 (PART B)</span></div>
+    <div class="letter-tiles-row" id="row2Tiles">
+      <div class="letter-tile"><div class="redacted"></div></div>
+    </div>
+    <div style="font-size:0.62rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.15em;">
+      Each letter brings you closer to the criminal's name.
+    </div>
+  </div>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+  startBinaryRain(0.05);
+
+  const CORRECT_ANS = "PHYSICAL SCIENCES";
+  const LETTER      = "W";
+
+  // These exact inputs → show "incorrect"
+  const FOOD_TRAPS = ["FOOD", "FOOD PROCESSING", "FOOD PROCESSING DEPARTMENT"];
+
+  let hintsUsed   = 0;
+  let levelSolved = false;
+
+  const teamId   = localStorage.getItem("teamId");
+  const teamName = localStorage.getItem("teamName");
+
+  if (!teamId) window.location.href = "index.html";
+
+  // Skip forward if Part A already done
+  const cl = localStorage.getItem("currentLevel");
+  if (cl === "1B" || cl === "2A" || cl === "2B") {
+    window.location.href = "level1.html";
+  }
+
+  // Render any already-collected letters
+  renderTwoRowTiles();
+
+  async function checkAnswer() {
+    if (levelSolved) return;
+
+    const input    = document.getElementById("answerInput");
+    const feedback = document.getElementById("answerFeedback");
+    const dirBox   = document.getElementById("directionResponse");
+
+    // Reset UI
+    feedback.className   = "answer-feedback";
+    feedback.textContent = "";
+    dirBox.classList.remove("show");
+    dirBox.textContent   = "";
+
+    const raw     = input.value.trim();
+    const userAns = raw.toUpperCase();
+    if (!userAns) return;
+
+    if (userAns === CORRECT_ANS) {
+      // ── CORRECT ──
+      levelSolved = true;
+
+      // Save letter to row1 immediately
+      addLetterRow1(LETTER);
+      localStorage.setItem("currentLevel", "1B");
+
+      // Re-render tiles so letter is visible before overlay appears
+      renderTwoRowTiles();
+
+      // Fire-and-forget sheet log
+      logToSheet({ teamId, teamName, level: "1A", letter: LETTER, action: "part_a_complete" });
+
+      // Show full-screen overlay immediately
+      document.getElementById("partUnlockScreen").classList.add("show");
+
+    } else if (FOOD_TRAPS.includes(userAns)) {
+      // ── FOOD TRAP ── explicitly wrong
+      shake(input);
+      feedback.className   = "answer-feedback wrong";
+      feedback.textContent = "✗ Incorrect. That's not it — think again.";
+
+    } else {
+      // ── ANY OTHER INPUT ── send them there, no "incorrect" text
+      shake(input);
+      dirBox.textContent = `→ Head to the ${raw} department and scan the QR code there to find out.`;
+      dirBox.classList.add("show");
+    }
+  }
+
+  function shake(el) {
+    el.classList.remove("shake");
+    void el.offsetWidth;
+    el.classList.add("shake");
+    setTimeout(() => el.classList.remove("shake"), 500);
+  }
+
+  document.getElementById("answerInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") checkAnswer();
+  });
+
+  function unlockHint(index) {
+    if (hintsUsed > index) return;
+    document.getElementById(`hintContent${index}`).classList.add("show");
+    const btn = document.getElementById(`hintBtn${index}`);
+    btn.textContent = "DECRYPTED";
+    btn.disabled    = true;
+    hintsUsed++;
+    document.getElementById("hintsLeft").textContent = 3 - hintsUsed;
+    const nextBtn = document.getElementById(`hintBtn${index + 1}`);
+    if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = "DECRYPT"; }
+  }
+</script>
+</body>
+</html>
